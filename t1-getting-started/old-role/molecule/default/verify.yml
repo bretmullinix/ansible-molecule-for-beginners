@@ -4,7 +4,7 @@
   hosts: all
   tasks:
   - name: Check if Service Exists
-    stat: path=/usr/lib/systemd/system/httpd.service
+    stat: path=/etc/init.d/httpd
     register: service_status
    
   - name: Check for the existence of httpd

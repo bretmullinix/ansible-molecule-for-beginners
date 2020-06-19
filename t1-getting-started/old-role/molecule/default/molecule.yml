@@ -7,12 +7,6 @@ platforms:
   - name: instance
     image: docker.io/pycontribs/centos:7
     pre_build_image: true
-    command: /sbin/init
-    tmpfs:
-      - /run
-      - /tmp
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
 verifier:
