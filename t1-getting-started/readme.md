@@ -61,8 +61,6 @@ python virtual environments.
     software for each virtual environment.
 
 1. Run `python3.8 -m venv venv_ansible_molecule`
-1. To activate your virtual environment on **Windows**, you run
-`./venv_ansible_molecule/Scripts/activate`
 1. To activate your virtual environment on **Fedora**, you run
 `source ./venv_ansible_molecule/bin/activate`
 1. Run `python --version`.  This is the version of Python running in your
