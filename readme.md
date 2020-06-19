@@ -24,7 +24,7 @@ known as **Red**, **Green**, **Refactor**.
 1. A working knowledge of **Docker**.
 1. A working knowledge of **Ansible**.  If you need a tutorial for **Ansible**,
 please complete the tutorials in the
-[ansible for beginners](../ansible-for-beginners) repo.
+[ansible for beginners](https://github.com/bretmullinix/ansible-for-beginners) repo.
 
 ## Tutorials
 
