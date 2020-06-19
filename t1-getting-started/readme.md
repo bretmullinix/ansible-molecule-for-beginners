@@ -73,7 +73,7 @@ virtual environment
 1. Run `pip list` to confirm **ansible 2.9** is installed.
 1. Run `pip install molecule==3.0.4`
 1. Run `pip list` to confirm **molecule 3.0.4** is installed.
-1  Run 'pip install molecule[docker]'
+1.  Run `pip install molecule[docker]`
 
     The **molecule[docker]** provides the code to spin up
     docker containers for molecule tests.
