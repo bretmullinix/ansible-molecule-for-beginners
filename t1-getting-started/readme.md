@@ -130,6 +130,11 @@ correspond to the ip of your VM.
 
     `molecule init role my-first-ansible-molecule-role`
 
+1. Run `tree my-first-ansible-molecule-role`
+
+    The following should be your output:
+    
+    ![my first ansible role tree image](../images/my-first-ansible-molecule-role.png)
 
 :construction: Under Construction...
 
