@@ -128,7 +128,7 @@ correspond to the ip of your VM.
 
 1. Create an Ansible role with Molecule by running the following:
 
-`molecule init role my-first-ansible-molecule-role`
+    `molecule init role my-first-ansible-molecule-role`
 
 
 :construction: Under Construction...
