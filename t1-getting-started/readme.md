@@ -71,7 +71,7 @@ environment.  Notice how ansible is not present.
 1. Run `pip install ansible==2.9`.  The command installs **ansible 2.9** in the
 virtual environment
 1. Run `pip list` to confirm **ansible 2.9** is installed.
-1. Run 'pip install molecule==3.0.4'
+1. Run `pip install molecule==3.0.4`
 1. Run `pip list` to confirm **molecule 3.0.4** is installed.
 1  Run 'pip install molecule[docker]'
 
