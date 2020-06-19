@@ -1,6 +1,0 @@
----
-# tasks file for my-first-ansible-molecule-role
-- name: Install httpd
-  yum:
-    name: httpd
-    state: present

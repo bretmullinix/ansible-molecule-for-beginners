@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include my-first-ansible-molecule-role"
-      include_role:
-        name: "my-first-ansible-molecule-role"

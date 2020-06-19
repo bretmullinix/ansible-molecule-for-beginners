@@ -281,6 +281,8 @@ correspond to the ip of your VM.
         1. Run `molecule converge`.  The role works as expected, but we are not in **Green** yet.
 
         1. Run `molecule verify`.  The verification passed, and we are now in the **Green**.
+        
+        1. Run `molecule destroy` to clean up your testing.
     
     1.  **Refactor** the code.  Take a look at the **tasks/main.yml** and the **verify.yml** to see
     if you can make the code better for maintenance, usability, or any other valid reasons.
