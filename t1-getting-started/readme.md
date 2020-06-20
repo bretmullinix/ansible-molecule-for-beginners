@@ -1,11 +1,11 @@
-# Working with Ansible
+# Working with Ansible Molecule
 
-Last updated: 06.19.2020
+Last updated: 06.20.2020
 
 ## Purpose
 
-The purpose of this document is to show how to install
-and work with **Ansible Molecule**.
+The purpose of this document is to provide a tutorial on setting up
+and using **Ansible Molecule**.
 
 ## Prerequisites
 
@@ -136,8 +136,8 @@ correspond to the ip of your VM.
     
     ![my first ansible role tree image](../images/my-first-ansible-molecule-role.png)
 
-    The **Ansible Molecule** role looks like a typical Ansible role, with the expection
-    of the **molecule** folder.  The explanation of the **molecule** folder is below:
+    The **Ansible Molecule** role looks like a typical Ansible role, except for 
+    the **molecule** folder.  The explanation of the **molecule** folder is below:
     
     1. **default** directory = The name of the molecule scenario.  The molecule tests
     can be separated into different **scenarios** to test the role in different ways.
@@ -182,11 +182,13 @@ correspond to the ip of your VM.
        is ansible.
        
        1. **verifier** = The **verifier** runs tests after running the ansible code.  Currently, we are using
-       the **ansible** verifier.  The **ansible** verifier uses the **verify.yml** to test that the changes
-       made by running the role have occurred.  If the changes have not occurred according to the **verify.yml**,
+       the **ansible** verifier.  The **ansible** verifier uses the **verify.yml** to test that the proper
+       changes are made by the role.  If the changes have not occurred according to the **verify.yml**,
        the tests fail.
-   1.  We need to make a change to the molecule.yml to allow the access to systemctl.  Add the following
-   contents under the **platforms** element.  The content should be aligned to the **pre_build_image** element above it:
+   1.  We need to make a change to the molecule.yml to allow access to systemctl.  Add the following
+   contents under the **platforms** element.  The content should be aligned to the
+   **pre_build_image** element above it:
+      
        ```yaml
         command: /sbin/init
         tmpfs:
@@ -196,8 +198,8 @@ correspond to the ip of your VM.
           - /sys/fs/cgroup:/sys/fs/cgroup:ro
        ```
       
-   1. **verify.yml**:  The ansible code to run after running the ansible role.  The code checks for the changes,
-   and if they haven't occurred, the molecule test fails.
+   1. **verify.yml**:  The ansible code to run after running the ansible role.
+   The code checks for proper changes, and if they haven't occurred, the molecule test fails.
 
     So we have to remember that we want to do **Test Driven Development** when we create any new code.  So lets begin.
     

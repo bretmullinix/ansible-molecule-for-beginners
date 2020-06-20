@@ -1,6 +1,6 @@
-# Working with Ansible
+# Working with Ansible Molecule
 
-Last updated: 06.19.2020
+Last updated: 06.20.2020
 
 ## Purpose
 
@@ -11,7 +11,7 @@ where you do the following for any new or changed code:
 
 1.  Create a test that fails
 2.  Create a test that passes with the smallest amount of code possible
-3.  **refactor**: Restructure the code for various reasons.  The reason
+3.  **Refactor**: Restructure the code for various reasons.  The reason
 could be maintainability, performance, etc.  
 4.  Repeat steps 1-3 until the new code has been added, or the code change is
 complete.
