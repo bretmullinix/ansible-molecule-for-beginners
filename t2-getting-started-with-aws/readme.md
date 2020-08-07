@@ -464,6 +464,27 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              
              This creates a variable that holds the subnet information
              obtained from "create ec2 vpc subnet" task. 
-   
+ 
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+               # create routing to/from internet
+               - name: Route IGW
+                 ec2_vpc_route_table:
+                   vpc_id: "{{ vpc.id }}"
+                   subnets:
+                     - "{{ vpc_subnet.id }}"
+                   routes:
+                     - dest: 0.0.0.0/0
+                       gateway_id: "{{ igw.gateway_id  }}"
+                   tags:
+                     Name: "aws_cluster_route"
+
+             ``` 
+             
+             This creates the route table to allow the internal vpc subnet
+             to talk to the internet gateway.  The route says to allow
+             all ip addresses (0.0.0.0/0) through the gateway.
+  
         :construction: Under construction.
  
