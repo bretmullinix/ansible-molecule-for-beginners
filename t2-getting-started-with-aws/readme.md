@@ -619,7 +619,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
        1. Let's not recreate the AWS key pair.  Change the value of 
        **create_private_key** to **false** in the **molecule/default/vars/main.yml** 
        file.
-       1. The only problem now is that we have a created a VM, but we need
+       1. The only problem now is that we have created a VM, but we need
        to destroy the VM after the molecule tests.  This is where we have
        to change the **destroy.yaml**.      
 
