@@ -600,8 +600,8 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                   timeout: 320
              ```   
 
-             This creates the file describing the vms in the molecule directory 
-             that is used to run the ansible role.
+             This tests the EC2 instance to make sure we can reach it via
+             ssh.
 
        1. Add the following contents to the end of the **create.yml** file.
               
