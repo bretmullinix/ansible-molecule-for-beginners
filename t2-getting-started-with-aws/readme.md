@@ -175,7 +175,7 @@ virtual environment.
       1. We added the **ssh_connection_options** to override the default
       way that Ansible Molecule connects via ssh.
       
-      1. We change the **name** of the vm to **aws-ec2-instance** to coorespond to
+      1. We changed the **name** of the vm to **aws-ec2-instance** to coorespond to
       the name of our EC2 instance.
       
       1. We added **log** equal to true to see more verbose output when
