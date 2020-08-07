@@ -59,46 +59,24 @@
       with_items: "{{ aws_instances }}"
       register: instance_config_dict
 
-
-    - name: Debug variable
-      debug:
-        var: instance_config_dict
-
-
     - name: Convert instance config dict to a list
       set_fact:
         instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
 
-    - name: Print instance_conf list
-      debug:
-        var:  instance_conf
-
-    - name: Print instance_conf molecule file
-      debug:
-        msg:  "{{ instance_conf | to_json | from_json | molecule_to_yaml | molecule_header }}"
-
-    #- fail:
-     #   msg: "Fail on purpose"
-
     - name: create a VPC with dedicated tenancy and a couple of tags
       ec2_vpc_net:
-        name: vpc_aws_idm
+        name: vpc_aws
         cidr_block: 10.10.0.0/16
         dns_support: yes
         dns_hostnames: yes
         tags:
-          module: "Openshift Cluster VPC"
+          module: "Amazon Cluster VPC"
         tenancy: default
       register: ec2_vpc_net
 
     - name: Set the VPC Fact
       set_fact:
         vpc: "{{ ec2_vpc_net.vpc }}"
-
-
-    - name: debug vpc object
-      debug:
-        msg: "{{ vpc }}"
 
     - name: create ec2 vpc subnet
     # create the subnet for the vpc with a cidr block

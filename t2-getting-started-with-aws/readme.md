@@ -272,9 +272,9 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              set_fact:
                molecule_ephemeral_directory: '{{ lookup(''env'', ''MOLECULE_EPHEMERAL_DIRECTORY'') }}'
            ```
-        
-        1. The contents above creates the variable called **molecule_ephemeral_directory**.
-        The variable holds the directory path where molecule creates all the necessary artifacts to run a molecule scenario.
+           
+           This creates the variable called **molecule_ephemeral_directory**.
+           The variable holds the directory path where molecule creates all the necessary artifacts to run a molecule scenario.
         
         1. Add the following contents to the end of the **create.yml** file.
         
@@ -283,9 +283,9 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                set_fact:
                  aws_molecule_private_key_file: "{{ molecule_ephemeral_directory }}/private_key"
            ```
-        
-        1. The contents above creates the variable called **aws_molecule_private_key_file**.
-        The variable holds the full file path to where we add the Amazon private key.
+           
+           This creates the variable called **aws_molecule_private_key_file**.
+           The variable holds the full file path to where we add the Amazon private key.
         
         1. Add the following contents to the end of the **create.yml** file.
      
@@ -296,10 +296,10 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                 state: absent
               when: create_private_key == true
            ```   
-      
-        1. The contents above deletes the existing Amazon EC2 public/private key pair.
-        We perform this task when we want to create a new key pair with the same name.
-        We use the new key pair to ssh into the Amazon EC2 instance.
+           
+           This deletes the existing Amazon EC2 public/private key pair.
+           We perform this task when we want to create a new key pair with the same name.
+           We use the new key pair to ssh into the Amazon EC2 instance.
      
         1. Add the following contents to the end of the **create.yml** file.
           
@@ -311,8 +311,8 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              register: key_pair_details
            ```   
            
-        1. The contents above creates the Amazon EC2 public/private key pair.
-        We use the key pair to ssh into the Amazon EC2 instance.
+           This creates the Amazon EC2 public/private key pair.
+           We use the key pair to ssh into the Amazon EC2 instance.
        
         1. Add the following contents to the end of the **create.yml** file.
           
@@ -321,10 +321,10 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
               set_fact:
                 aws_keypair: "{{ key_pair_details['key'] }}"
             ```   
-           
-        1. The contents above extracts the key pair information from the output
-        of the previous task.  We will use the information to
-        extract the private key and store the value in our private key file.
+            
+            This extracts the key pair information from the output
+            of the previous task.  We will use the information to
+            extract the private key and store the value in our private key file.
 
         1. Add the following contents to the end of the **create.yml** file.
           
@@ -335,9 +335,9 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                  dest: "{{ aws_private_key }}"
                when: create_private_key == true
              ```   
-           
-        1. The contents above stores the private key in the 
-        **ansible-molecule-aws-role/files/aws_private_key** file.
+             
+             This stores the private key in the 
+             **ansible-molecule-aws-role/files/aws_private_key** file.
         
         1. Add the following contents to the end of the **create.yml** file.
               
@@ -348,11 +348,72 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                   dest: "{{ aws_molecule_private_key_file }}"
                   mode: 0600
              ```   
-               
-        1. The contents above copies the private key file to the ansible 
-        molecule directory.  The ansible molecule directory does not
-        exist until molecule executes and gets destroyed when the execution
-        is complete.
+             
+             This copies the private key file to the ansible 
+             molecule directory.  The ansible molecule directory does not
+             exist until molecule executes and gets destroyed when the execution
+             is complete.
+
+        1. Add the following contents to the end of the **create.yml** file.
               
+             ```yaml
+             - name: Populate instance config dict
+               set_fact:
+                 instance_conf_dict: {
+                        'instance': "{{ item.name }}",
+                         'address': "{{ item.public_ip }}",
+                         'user': "{{ item.user  }}",
+                         'port': "{{ item.port }}",
+                         'identity_file': "{{ aws_molecule_private_key_file }}", }
+               with_items: "{{ aws_instances }}"
+               register: instance_config_dict
+             ```   
+             
+             This creates the **instance_config_dict** variable.
+             The variable is a dictionary of **instance_conf_dict** objects.
+             Each of the objects represents a container or vm to run the ansible
+             role against.  In our case, we only have one vm, the **aws-ec2-instance**
+             EC2 instance.
+
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: Convert instance config dict to a list
+               set_fact:
+                 instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+             ```   
+             
+             This creates the **instance_conf** variable.
+             The variable transformed the **instance_config_dict.results** dictionary
+             into a list of objects.
+
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: create a VPC with dedicated tenancy and a couple of tags
+               ec2_vpc_net:
+                 name: vpc_aws
+                 cidr_block: 10.10.0.0/16
+                 dns_support: yes
+                 dns_hostnames: yes
+                 tags:
+                   module: "Amazon Cluster VPC"
+                 tenancy: default
+               register: ec2_vpc_net
+             ```   
+             
+             This creates an Amazon EC2 VPC called **vpc_aws**
+             with a network address of 10.10.0.0/16.  
+
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: Set the VPC Fact
+               set_fact:
+                 vpc: "{{ ec2_vpc_net.vpc }}"
+             ``` 
+             
+             This creates a variable to hold the Amazon EC2 VPC information. 
+   
         :construction:
  
