@@ -402,8 +402,9 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                register: ec2_vpc_net
              ```   
              
-             This creates an Amazon EC2 VPC called **vpc_aws**
-             with a network address of 10.10.0.0/16.  
+             This creates an Amazon EC2 VPC called **vpc_aws**.
+             The vpc has a cidr of 10.10.0.0/16.  The cidr binds
+             the vpc to this set of ip addresses.  
 
         1. Add the following contents to the end of the **create.yml** file.
               
@@ -414,6 +415,55 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              ``` 
              
              This creates a variable to hold the Amazon EC2 VPC information. 
+             
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+              - name: create ec2 vpc subnet
+                # create the subnet for the vpc with a cidr block
+                ec2_vpc_subnet:
+                  vpc_id: "{{ vpc.id }}"
+                  state: present
+                  cidr: "10.10.0.0/24"
+                  # enable public ip
+                  map_public: yes
+                  resource_tags:
+                    Name: "aws_subnet"
+                register: subnet_result
+             ``` 
+             
+             This creates the Amazon EC2 vpc subnet.  This subnet has 
+             a cidr of 10.10.0.0/24 which indicate all the possible 
+             subnet ip addresses. 
+             
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: create ec2 vpc internet gateway
+               # create an internet gateway for the vpc
+               ec2_vpc_igw:
+                 vpc_id: "{{ vpc.id }}"
+                 state: present
+                 tags:
+                   Name: "aws_cluster_gateway"
+               register: igw
+
+             ``` 
+             
+             This creates the Amazon EC2 vpc gateway.  The gateway
+             is what allows the vpc to get out to the internet.
+
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+            - name: Set the VPC Subnet Fact
+              set_fact:
+                vpc_subnet: "{{ subnet_result['subnet'] }}"
+
+             ``` 
+             
+             This creates a variable that holds the subnet information
+             obtained from "create ec2 vpc subnet" task. 
    
-        :construction:
+        :construction: Under construction.
  
