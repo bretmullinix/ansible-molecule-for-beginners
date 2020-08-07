@@ -323,7 +323,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
             ```   
            
         1. The contents above extracts the key pair information from the output
-        of creating the Amazon key pair.  We will use the information to
+        of the previous task.  We will use the information to
         extract the private key and store the value in our private key file.
 
         1. Add the following contents to the end of the **create.yml** file.
