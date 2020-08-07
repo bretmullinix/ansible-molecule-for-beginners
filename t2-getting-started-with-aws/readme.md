@@ -204,8 +204,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
 
     So we have to remember that we want to do **Test Driven Development** 
     when we create any new code or configuration.  In this case,
-    we will be not be adding any new code to the role.  We will be testing 
-    the configuration to ensure the AWS instance is running, 
+    we will be testing the configuration to ensure the AWS instance is running, 
     and we can gather facts.
 
 1. Add the code by running through the **Red, Green, Refactor** iteration:
