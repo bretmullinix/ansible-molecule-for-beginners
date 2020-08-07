@@ -1,0 +1,19 @@
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+  ssh_connection_options:
+    - '-o ControlPath=~/.ansible/cp/%r@%h-%p'
+platforms:
+  - name: aws-ec2-instance
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      remote_user: centos
+    privileged_escalation:
+      become: true
+      become_ask_pass: false
+verifier:
+  name: ansible
