@@ -1,6 +1,6 @@
 # Working with Ansible Molecule
 
-Last updated: 06.20.2020
+Last updated: 08.07.2020
 
 ## Purpose
 
