@@ -103,10 +103,6 @@
       set_fact:
         vpc_subnet: "{{ subnet_result['subnet'] }}"
 
-    - name: Debug Subnet
-      debug:
-        msg: "Here is your subnet:  {{ vpc_subnet.id }}"
-
     # create routing to/from internet
     - name: Route IGW
       ec2_vpc_route_table:
@@ -119,18 +115,16 @@
         tags:
           Name: "aws_cluster_route"
 
-    - name: openshift cluster with idm ec2 group
+    - name: create the aws security group for the vpc
       ec2_group:
         name: aws_security_group
-        description: The security group for the Openshift Cluster with IDM
+        description: The security group for the AWS cluster
         vpc_id: "{{ vpc.id }}"
         rules:
           - proto: tcp
             ports:
               - 80
-            cidr_ip: 0.0.0.0/0
-          - proto: tcp
-            ports:
+              - 443
               - 22
             cidr_ip: 0.0.0.0/0
         tags:

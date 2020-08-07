@@ -485,6 +485,31 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              This creates the route table to allow the internal vpc subnet
              to talk to the internet gateway.  The route says to allow
              all ip addresses (0.0.0.0/0) through the gateway.
+             
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+              - name: create the aws security group for the vpc
+                ec2_group:
+                  name: aws_security_group
+                  description: The security group for the AWS cluster
+                  vpc_id: "{{ vpc.id }}"
+                  rules:
+                    - proto: tcp
+                      ports:
+                        - 80
+                        - 443
+                        - 22
+                      cidr_ip: 0.0.0.0/0
+                  tags:
+                    Name: "aws_security_group"
+                register: security_group
+             ``` 
+             
+             This creates the security group for the vpc.  The cluster allows
+             any inbound internet connections to any machine (0.0.0.0/0) for the ports
+             80, 443, and 22.
+
   
         :construction: Under construction.
  
