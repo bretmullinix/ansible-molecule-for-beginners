@@ -273,7 +273,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                molecule_ephemeral_directory: '{{ lookup(''env'', ''MOLECULE_EPHEMERAL_DIRECTORY'') }}'
            ```
         
-        1. The contents above create the variable called **molecule_ephemeral_directory**.
+        1. The contents above creates the variable called **molecule_ephemeral_directory**.
         The variable holds the directory path where molecule creates all the necessary artifacts to run a molecule scenario.
         
         1. Add the following contents to the end of the **create.yml** file.
@@ -284,7 +284,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
                  aws_molecule_private_key_file: "{{ molecule_ephemeral_directory }}/private_key"
            ```
         
-        1. The contents above create the variable called **aws_molecule_private_key_file**.
+        1. The contents above creates the variable called **aws_molecule_private_key_file**.
         The variable holds the full file path to where we add the Amazon private key.
         
         1. Add the following contents to the end of the **create.yml** file.
@@ -297,7 +297,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
               when: create_private_key == true
            ```   
       
-        1. The contents above delete the existing Amazon EC2 public/private key pair.
+        1. The contents above deletes the existing Amazon EC2 public/private key pair.
         We perform this task when we want to create a new key pair with the same name.
         We use the new key pair to ssh into the Amazon EC2 instance.
      
@@ -311,7 +311,7 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              register: key_pair_details
            ```   
            
-        1. The contents above create the Amazon EC2 public/private key pair.
+        1. The contents above creates the Amazon EC2 public/private key pair.
         We use the key pair to ssh into the Amazon EC2 instance.
        
         1. Add the following contents to the end of the **create.yml** file.
