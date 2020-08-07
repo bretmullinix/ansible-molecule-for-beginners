@@ -195,7 +195,7 @@ virtual environment.
                 
             1. **become_ask_pass** = false
             
-               This tells Ansible not to worry about asking for the
+               This tells ansible not to worry about asking for the
                **centos** user password when running **root** (
                privileged) commands.
 
