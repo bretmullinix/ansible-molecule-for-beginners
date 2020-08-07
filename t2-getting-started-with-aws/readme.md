@@ -612,13 +612,139 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              ```   
 
              This puts a pause at the end for 2 minutes to ensure the
-             EC2 instances is booted up.
+             EC2 instance boots up.
 
        1. From the terminal, go to the root role directory.
        1. Run `molecule create`.  Your **create.yml** file has been created.
+       1. Let's not recreate the AWS key pair.  Change the value of 
+       **create_private_key** to **false** in the **molecule/default/vars/main.yml** 
+       file.
        1. The only problem now is that we have a created a VM, but we need
        to destroy the VM after the molecule tests.  This is where we have
        to change the **destroy.yaml**.      
 
-        :construction: Under construction.
+       1. Add the following contents to the end of the **destroy.yml** file.
+           
+             ```yaml
+              - name: Include the variables needed for creation
+                include_vars:
+                  file: "vars/main.yml"
+             ```      
+
+             This imports our variables.
+
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+             - name: Gather EC2 Instance Facts
+               ec2_instance_facts:
+               register: ec2_info
  
+             - name: terminate
+               ec2:
+                 instance_ids: "{{ item.instance_id }}"
+                 state: absent
+                 wait: yes
+               with_items: "{{ ec2_info.instances }}"
+               when: item.state.name != 'terminated' and item.tags.Name == aws_instance_name
+             ```   
+
+             This queries the EC2 facts and then destroys the EC2 **aws-ec2-instance**
+             instance.
+
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+             - name: Query a VPC with dedicated tenancy and a couple of tags
+               ec2_vpc_net:
+                 name: vpc_aws
+                 cidr_block: 10.10.0.0/16
+                 dns_support: yes
+                 dns_hostnames: yes
+                 tags:
+                   module: "Amazon Cluster VPC"
+                 tenancy: default
+                 state: present
+               register: ec2_vpc_net
+ 
+             - name: Set the VPC Fact
+               set_fact:
+                 vpc: "{{ ec2_vpc_net.vpc }}"
+             ```   
+
+             This queries the vpc and creates a variable with the vpc information.
+      
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+              - name: Delete the aws security group for the vpc
+                ec2_group:
+                  name: aws_security_group
+                  state: absent
+                  vpc_id: "{{ vpc.id }}"
+             ```   
+
+             This deletes the security group associated with the vpc.          
+
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+             - name: Delete the subnet
+               ec2_vpc_subnet:
+                 vpc_id: "{{ vpc.id }}"
+                 state: absent
+                 cidr: "10.10.0.0/24"
+             ```   
+
+             This deletes the subnet associated with the vpc.          
+
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+              - name: Delete the gateway
+                ec2_vpc_igw:
+                  vpc_id: "{{ vpc.id }}"
+                  state: absent
+             ```   
+
+             This deletes the internet gateway associated with the vpc.          
+
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+              - name: Delete routing table
+                ec2_vpc_route_table:
+                  vpc_id: "{{ vpc.id }}"
+                  tags:
+                    Name: 'aws_cluster_route'
+                  state: absent
+             ```   
+
+             This deletes the routing table associated with the vpc.          
+
+       1. Add the following contents to the end of the **destroy.yml** file.
+              
+             ```yaml
+              - name: Delete the vpc
+                ec2_vpc_net:
+                  name: vpc_aws
+                  cidr_block: 10.10.0.0/16
+                  state: absent
+             ```   
+
+             This deletes the VPC.  All dependencies of the VPC had to be
+             deleted in order for us to delete the VPC.
+       
+       1. We can create and destroy the EC2 instance and VPC.  We are
+       ready to test the ansible role.
+       
+       1. Run `molecule converge`.  The role works as expected, 
+       but we are not in **Green** yet.
+       
+       1. Run `molecule verify`.  The verification passed, and we are
+       now in the **Green**.
+       
+       1. Run `molecule destroy` to clean up your testing.
+       
+    1. **Refactor** the code.  Take a look at the **tasks/main.yml** and the **verify.yml** to see
+           if you can make the code better for maintenance, usability, or any other valid reasons.

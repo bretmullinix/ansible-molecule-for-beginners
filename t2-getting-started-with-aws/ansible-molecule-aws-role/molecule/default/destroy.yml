@@ -18,3 +18,67 @@
         content: "{{ instance_conf | to_json | from_json | molecule_to_yaml | molecule_header }}"
         dest: "{{ molecule_instance_config }}"
       when: server.changed | default(false) | bool
+
+    - name: Include the variables needed for creation
+      include_vars:
+        file: "vars/main.yml"
+
+    - name: Gather EC2 Instance Facts
+      ec2_instance_facts:
+      register: ec2_info
+
+    - name: terminate
+      ec2:
+        instance_ids: "{{ item.instance_id }}"
+        state: absent
+        wait: yes
+      with_items: "{{ ec2_info.instances }}"
+      when: item.state.name != 'terminated' and item.tags.Name == aws_instance_name
+
+    - name: Query a VPC with dedicated tenancy and a couple of tags
+      ec2_vpc_net:
+        name: vpc_aws
+        cidr_block: 10.10.0.0/16
+        dns_support: yes
+        dns_hostnames: yes
+        tags:
+          module: "Amazon Cluster VPC"
+        tenancy: default
+        state: present
+      register: ec2_vpc_net
+
+    - name: Set the VPC Fact
+      set_fact:
+        vpc: "{{ ec2_vpc_net.vpc }}"
+
+    - name: Delete the aws security group for the vpc
+      ec2_group:
+        name: aws_security_group
+        state: absent
+        vpc_id: "{{ vpc.id }}"
+
+    - name: Delete the subnet
+      ec2_vpc_subnet:
+        vpc_id: "{{ vpc.id }}"
+        state: absent
+        cidr: "10.10.0.0/24"
+
+    - name: Delete the gateway
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc.id }}"
+        state: absent
+
+    - name: Delete routing table
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc.id }}"
+        tags:
+          Name: 'aws_cluster_route'
+        state: absent
+
+    - name: Delete the vpc
+      ec2_vpc_net:
+        name: vpc_aws
+        cidr_block: 10.10.0.0/16
+        state: absent
+
+

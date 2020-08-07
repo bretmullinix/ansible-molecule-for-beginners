@@ -2,7 +2,7 @@ aws_instance_name: "aws-ec2-instance"
 aws_key_pair: "my_keypair"
 role_path: "../.."
 aws_private_key: "{{ role_path }}/files/aws_private_key"
-create_private_key: true
+create_private_key: false
 aws_default_image_size: 8
 aws_image_size: 20
 aws_ami: "ami-00594b9c138e6303d"

@@ -1,2 +1,10 @@
 ---
 # tasks file for ansible-molecule-aws-role
+
+- name: Check the ID of the Current User
+  command: "id"
+  register: output_from_id_command
+
+- name: Show the output of the ID command
+  debug:
+    var: output_from_id_command
