@@ -36,16 +36,10 @@
       set_fact:
         aws_keypair: "{{ key_pair_details['key'] }}"
 
-    - name: Show Key Pair Information
-      debug:
-        msg: "Here is your key pair:  {{ aws_keypair }}"
-
     - name: Copy the private key to a file so we can ssh into it
       copy:
         content: "{{ aws_keypair['private_key'] }}"
         dest: "{{ aws_private_key }}"
-      vars:
-        ansible_python_interpreter:  /home/bmullini/Documents/redhat_tools/python/virtual_environments/IntelliJ/bin/python3.7
       when: create_private_key == true
 
     - name: Copy the private key to the molecule config directory

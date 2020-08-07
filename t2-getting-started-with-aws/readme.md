@@ -276,5 +276,83 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
         1. The contents above create the variable called **molecule_ephemeral_directory**.
         The variable holds the directory path where molecule creates all the necessary artifacts to run a molecule scenario.
         
+        1. Add the following contents to the end of the **create.yml** file.
+        
+            ```yaml
+             - name: Set the molecule directory private key
+               set_fact:
+                 aws_molecule_private_key_file: "{{ molecule_ephemeral_directory }}/private_key"
+           ```
+        
+        1. The contents above create the variable called **aws_molecule_private_key_file**.
+        The variable holds the full file path to where we add the Amazon private key.
+        
+        1. Add the following contents to the end of the **create.yml** file.
+     
+           ```yaml
+            - name: create a new ec2 key pair, returns generated private key
+              ec2_key:
+                name: "{{ aws_idm_key_pair }}"
+                state: absent
+              when: create_private_key == true
+           ```   
+      
+        1. The contents above delete the existing Amazon EC2 public/private key pair.
+        We perform this task when we want to create a new key pair with the same name.
+        We use the new key pair to ssh into the Amazon EC2 instance.
+     
+        1. Add the following contents to the end of the **create.yml** file.
+          
+                ```yaml
+                 - name: create a new ec2 key pair, returns generated private key
+                   ec2_key:
+                     name: "{{ aws_idm_key_pair }}"
+                     state: present
+                   register: key_pair_details
+                ```   
+           
+        1. The contents above create the Amazon EC2 public/private key pair.
+        We use the key pair to ssh into the Amazon EC2 instance.
+       
+        1. Add the following contents to the end of the **create.yml** file.
+          
+                ```yaml
+                - name: Set Key Pair Facts
+                  set_fact:
+                    aws_keypair: "{{ key_pair_details['key'] }}"
+                ```   
+           
+        1. The contents above extracts the key pair information from the output
+        of creating the Amazon key pair.  We will use the information to
+        extract the private key and store the value in our private key file.
+
+        1. Add the following contents to the end of the **create.yml** file.
+          
+                ```yaml
+                - name: Copy the private key to a file so we can ssh into it
+                  copy:
+                    content: "{{ aws_keypair['private_key'] }}"
+                    dest: "{{ aws_private_key }}"
+                  when: create_private_key == true
+                ```   
+           
+        1. The contents above stores the private key in the 
+        **ansible-molecule-aws-role/files/aws_private_key** file.
+        
+        1. Add the following contents to the end of the **create.yml** file.
+              
+                 ```yaml
+                  - name: Copy the private key to the molecule config directory
+                    copy:
+                      src: "{{ aws_private_key }}"
+                      dest: "{{ aws_molecule_private_key_file }}"
+                      mode: 0600
+                 ```   
+               
+        1. The contents above copies the private key file to the ansible 
+        molecule directory.  The ansible molecule directory does not
+        exist until molecule executes and gets destroyed when the execution
+        is complete.
+              
         :construction:
  
