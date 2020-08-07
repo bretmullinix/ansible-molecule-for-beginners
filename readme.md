@@ -35,6 +35,12 @@ The tutorials in this repo are as follows:
     Shows the user how to set up their environment
     and run **Ansible Molecule**.  The tutorial is located in the
     [**t1-getting-started**](./t1-getting-started) folder.
+
+1. **Running Ansible Molecule on AWS**
+
+    Shows the user how to set up their environment
+    and run **Ansible Molecule** on AWS.  The tutorial is located in the
+    [**t2-getting-started-with-aws**](./t2-getting-started-with-aws) folder.
     
 
 
