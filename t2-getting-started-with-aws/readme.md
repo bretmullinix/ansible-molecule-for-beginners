@@ -85,7 +85,7 @@ virtual environment.
 
 1. Open up a terminal
 1. `source ./venv_ansible_molecule_and_aws/bin/activate`
-1.  Create an Ansible role with Molecule by running the following:
+1.  Create an Ansible role with molecule by running the following:
 
     `molecule init role ansible-molecule-aws-role -d delegated`
 
@@ -95,7 +95,7 @@ virtual environment.
     
     ![ansible moelcule aws role](../images/tree-ansible-moleule-role-aws.png)
 
-    The **Ansible Molecule** role looks like a typical Ansible role, except for 
+    The **ansible molecule** role looks like a typical ansible role, except for 
     the **molecule** folder.  The explanation of the **molecule** folder is below:
     
     1. **default** directory = The name of the molecule scenario.  The molecule tests
@@ -132,8 +132,8 @@ virtual environment.
        1. **driver** = The driver used to spin up either a container or vm to 
        run the molecule tests.  In our case, we will be using the **delegated** driver.  
        The **delegated** driver provides the **hooks** necessary to run 
-       Ansible Molecule with your unique vm or container environment.
-       In our case, we will integrate AWS into Ansible Molecule using the **hooks**.
+       ansible molecule with your unique vm or container environment.
+       In our case, we will integrate AWS into ansible molecule using the **hooks**.
        
        1. **platform** = Given the driver, this tells molecule how to configure 
        the container or vm.  In our case, we will be spinning up an AWS EC2 instance as our vm.  We
@@ -199,8 +199,8 @@ virtual environment.
                **centos** user password when running **root** (
                privileged) commands.
 
-   1. **verify.yml**:  The ansible code to run after running the ansible role.
-   The code checks for proper changes, and if they haven't occurred, the molecule test fails.
+1. **verify.yml**:  The ansible code to run after running the ansible role.
+The code checks for proper changes, and if they haven't occurred, the molecule test fails.
 
     So we have to remember that we want to do **Test Driven Development** 
     when we create any new code or configuration.  In this case,
