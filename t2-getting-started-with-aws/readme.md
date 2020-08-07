@@ -357,39 +357,6 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
         1. Add the following contents to the end of the **create.yml** file.
               
              ```yaml
-             - name: Populate instance config dict
-               set_fact:
-                 instance_conf_dict: {
-                        'instance': "{{ item.name }}",
-                         'address': "{{ item.public_ip }}",
-                         'user': "{{ item.user  }}",
-                         'port': "{{ item.port }}",
-                         'identity_file': "{{ aws_molecule_private_key_file }}", }
-               with_items: "{{ aws_instances }}"
-               register: instance_config_dict
-             ```   
-             
-             This creates the **instance_config_dict** variable.
-             The variable is a dictionary of **instance_conf_dict** objects.
-             Each of the objects represents a container or vm to run the ansible
-             role against.  In our case, we only have one vm, the **aws-ec2-instance**
-             EC2 instance.
-
-        1. Add the following contents to the end of the **create.yml** file.
-              
-             ```yaml
-             - name: Convert instance config dict to a list
-               set_fact:
-                 instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
-             ```   
-             
-             This creates the **instance_conf** variable.
-             The variable transformed the **instance_config_dict.results** dictionary
-             into a list of objects.
-
-        1. Add the following contents to the end of the **create.yml** file.
-              
-             ```yaml
              - name: create a VPC with dedicated tenancy and a couple of tags
                ec2_vpc_net:
                  name: vpc_aws
@@ -509,7 +476,149 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
              This creates the security group for the vpc.  The cluster allows
              any inbound internet connections to any machine (0.0.0.0/0) for the ports
              80, 443, and 22.
+ 
+         1. Add the following contents to the end of the **create.yml** file.
+               
+              ```yaml
+               - name: create the aws security group for the vpc
+                 ec2_group:
+                   name: aws_security_group
+                   description: The security group for the AWS cluster
+                   vpc_id: "{{ vpc.id }}"
+                   rules:
+                     - proto: tcp
+                       ports:
+                         - 80
+                         - 443
+                         - 22
+                       cidr_ip: 0.0.0.0/0
+                   tags:
+                     Name: "aws_security_group"
+                 register: security_group
+              ``` 
+              
+              This creates the security group for the vpc.  The cluster allows
+              any inbound internet connections to any machine (0.0.0.0/0) for the ports
+              80, 443, and 22.            
 
+         1. Add the following contents to the end of the **create.yml** file.
+               
+              ```yaml
+                  # Single instance with ssd gp2 root volume
+                  - name: Create IDM EC2 Instance
+                    ec2:
+                      key_name: "{{ aws_key_pair }}"
+                      group: "aws_security_group"
+                      instance_type: t2.medium
+                      image: "{{ aws_ami }}"
+                      wait: yes
+                      wait_timeout: 500
+                      volumes:
+                        - device_name: /dev/sda1
+                          volume_type: gp2
+                          volume_size: 20
+                          delete_on_termination: true
+                      vpc_subnet_id: "{{ vpc_subnet.id }}"
+                      assign_public_ip: yes
+                      count_tag:
+                        Name: "{{ aws_instance_name }}"
+                      instance_tags:
+                        Name: "{{ aws_instance_name }}"
+                      exact_count: 1
+                    register: ec2_facts
+              ``` 
+              
+              This creates the **aws-ec2-instance** EC2 instance we will be running
+              the molecule tests on.  Notice that the volume can be changed
+              to a larger root volume.  Currently, we are using a 20 GB hard drive.            
+
+         1. Add the following contents to the end of the **create.yml** file.
+               
+              ```yaml
+              - name: Set public ip address for ec2 instance
+                set_fact:
+                  aws_public_ip: "{{ ec2_facts.tagged_instances[0].public_ip }}"
+              ``` 
+              
+              This creates the variable called **aws_public_ip**.  The variable
+              is populated with the **aws-ec2-instance** EC2 instance public ip.
+                
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: Populate instance config dict
+               set_fact:
+                 instance_conf_dict: {
+                        'instance': "{{ item.name }}",
+                         'address': "{{ aws_public_ip }}",
+                         'user': "{{ item.user  }}",
+                         'port': "{{ item.port }}",
+                         'identity_file': "{{ aws_molecule_private_key_file }}", }
+               with_items: "{{ aws_instances }}"
+               register: instance_config_dict
+             ```   
+             
+             This creates the **instance_config_dict** variable.
+             The variable is a dictionary of **instance_conf_dict** objects.
+             Each of the objects represents a container or vm to run the ansible
+             role against.  In our case, we only have one vm, the **aws-ec2-instance**
+             EC2 instance.
+
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: Convert instance config dict to a list
+               set_fact:
+                 instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+             ```   
+             
+             This creates the **instance_conf** variable.
+             The variable transformed the **instance_config_dict.results** dictionary
+             into a list of objects.
+
+        1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: Dump instance config
+               copy:
+                 content: "{{ instance_conf | to_json | from_json | molecule_to_yaml | molecule_header }}"
+                 dest: "{{ molecule_instance_config }}"
+             ```   
+             
+             This creates the file describing the vms in the molecule directory 
+             that is used to run the ansible role.
   
+       1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+              - name: Wait for SSH
+                wait_for:
+                  port: 22
+                  host: "{{ aws_public_ip }}"
+                  search_regex: SSH
+                  delay: 10
+                  timeout: 320
+             ```   
+
+             This creates the file describing the vms in the molecule directory 
+             that is used to run the ansible role.
+
+       1. Add the following contents to the end of the **create.yml** file.
+              
+             ```yaml
+             - name: Wait for boot process to finish
+               pause:
+                 minutes: 2
+             ```   
+
+             This puts a pause at the end for 2 minutes to ensure the
+             EC2 instances is booted up.
+
+       1. From the terminal, go to the root role directory.
+       1. Run `molecule create`.  Your **create.yml** file has been created.
+       1. The only problem now is that we have a created a VM, but we need
+       to destroy the VM after the molecule tests.  This is where we have
+       to change the **destroy.yaml**.      
+
         :construction: Under construction.
  
