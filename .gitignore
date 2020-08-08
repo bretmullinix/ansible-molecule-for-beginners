@@ -3,3 +3,5 @@
 my_key
 virtual_environments/
 vendor/
+bundle/
+Gemfile
