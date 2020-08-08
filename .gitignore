@@ -2,3 +2,4 @@
 *.retry
 my_key
 virtual_environments/
+vendor/
