@@ -480,30 +480,6 @@ The code checks for proper changes, and if they haven't occurred, the molecule t
          1. Add the following contents to the end of the **create.yml** file.
                
               ```yaml
-               - name: create the aws security group for the vpc
-                 ec2_group:
-                   name: aws_security_group
-                   description: The security group for the AWS cluster
-                   vpc_id: "{{ vpc.id }}"
-                   rules:
-                     - proto: tcp
-                       ports:
-                         - 80
-                         - 443
-                         - 22
-                       cidr_ip: 0.0.0.0/0
-                   tags:
-                     Name: "aws_security_group"
-                 register: security_group
-              ``` 
-              
-              This creates the security group for the vpc.  The cluster allows
-              any inbound internet connections to any machine (0.0.0.0/0) for the ports
-              80, 443, and 22.            
-
-         1. Add the following contents to the end of the **create.yml** file.
-               
-              ```yaml
                   # Single instance with ssd gp2 root volume
                   - name: Create IDM EC2 Instance
                     ec2:
