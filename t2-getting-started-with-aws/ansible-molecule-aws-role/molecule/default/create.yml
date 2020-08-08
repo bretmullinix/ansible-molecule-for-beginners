@@ -12,11 +12,13 @@
 
     - name: Set molecule directory
       set_fact:
-        molecule_ephemeral_directory: '{{ lookup(''env'', ''MOLECULE_EPHEMERAL_DIRECTORY'') }}'
+        molecule_ephemeral_directory:
+          '{{ lookup(''env'', ''MOLECULE_EPHEMERAL_DIRECTORY'') }}'
 
     - name: Set the molecule directory private key
       set_fact:
-        aws_molecule_private_key_file: "{{ molecule_ephemeral_directory }}/private_key"
+        aws_molecule_private_key_file:
+          "{{ molecule_ephemeral_directory }}/private_key"
 
     # TODO: Developer must implement and populate 'server' variable
     # Terminate every running instance in a region. Use with EXTREME caution.
@@ -52,8 +54,8 @@
       ec2_vpc_net:
         name: vpc_aws
         cidr_block: 10.10.0.0/16
-        dns_support: yes
-        dns_hostnames: yes
+        dns_support: true
+        dns_hostnames: true
         tags:
           module: "Amazon Cluster VPC"
         tenancy: default
@@ -64,13 +66,13 @@
         vpc: "{{ ec2_vpc_net.vpc }}"
 
     - name: create ec2 vpc subnet
-    # create the subnet for the vpc with a cidr block
+      # create the subnet for the vpc with a cidr block
       ec2_vpc_subnet:
         vpc_id: "{{ vpc.id }}"
         state: present
         cidr: "10.10.0.0/24"
         # enable public ip
-        map_public: yes
+        map_public: true
         resource_tags:
           Name: "aws_subnet"
       register: subnet_result
@@ -124,7 +126,7 @@
         group: "aws_security_group"
         instance_type: t2.medium
         image: "{{ aws_ami }}"
-        wait: yes
+        wait: true
         wait_timeout: 500
         volumes:
           - device_name: /dev/sda1
@@ -132,7 +134,7 @@
             volume_size: 20
             delete_on_termination: true
         vpc_subnet_id: "{{ vpc_subnet.id }}"
-        assign_public_ip: yes
+        assign_public_ip: true
         count_tag:
           Name: "{{ aws_instance_name }}"
         instance_tags:
@@ -148,25 +150,28 @@
     - name: Populate instance config dict
       set_fact:
         instance_conf_dict: {
-               'instance': "{{ item.name }}",
-                'address': "{{ aws_public_ip }}",
-                'user': "{{ item.user  }}",
-                'port': "{{ item.port }}",
-                'identity_file': "{{ aws_molecule_private_key_file }}",
-                'become_method': "sudo",
-                'become_ask_pass': false,
+          'instance': "{{ item.name }}",
+          'address': "{{ aws_public_ip }}",
+          'user': "{{ item.user  }}",
+          'port': "{{ item.port }}",
+          'identity_file': "{{ aws_molecule_private_key_file }}",
+          'become_method': "sudo",
+          'become_ask_pass': false,
 
-                }
+        }
       with_items: "{{ aws_instances }}"
       register: instance_config_dict
 
     - name: Convert instance config dict to a list
       set_fact:
-        instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+        instance_conf:
+          "{{ instance_config_dict.results
+          | map(attribute='ansible_facts.instance_conf_dict') | list }}"
 
     - name: Dump instance config
       copy:
-        content: "{{ instance_conf | to_json | from_json | molecule_to_yaml | molecule_header }}"
+        content: "{{ instance_conf
+          | to_json | from_json | molecule_to_yaml | molecule_header }}"
         dest: "{{ molecule_instance_config }}"
 
 
